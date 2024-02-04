@@ -55,6 +55,7 @@ public class AirportRepository {
     }
 
     public int getNumberOfPeopleOn(Date date, String airportName){
+        if(flightDb.size()<=0 || airportDb.size()<=0 ||fpDb.size()<=0) return 0;
         int count = 0;
         City city = airportDb.get(airportName).getCity();
         for(int id : flightDb.keySet()){
