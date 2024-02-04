@@ -27,7 +27,11 @@ public class AirportService {
     }
 
     public int getNumberOfPeopleOn(Date date,String airportName){
-        return airportRepository.getNumberOfPeopleOn(date,airportName);
+        try {
+            return airportRepository.getNumberOfPeopleOn(date,airportName);
+        }catch (Exception e){
+            return 0;
+        }
     }
 
     public int calculateFlightFare(Integer flightId){
