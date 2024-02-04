@@ -19,9 +19,7 @@ public class AirportService {
     }
 
     public String getLargestAirportName(){
-        List<String> largeAir = airportRepository.getLargestAirportName();
-        Collections.sort(largeAir);
-        return largeAir.get(0);
+        return airportRepository.getLargestAirportName();
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity,City toCity){

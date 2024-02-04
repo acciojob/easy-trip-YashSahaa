@@ -6,34 +6,28 @@ import com.driver.model.Flight;
 import com.driver.model.Passenger;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Callable;
 
 @Repository
 public class AirportRepository {
-    HashMap<String,Airport> airportDb;
-    HashMap<Integer,Flight> flightDb;
-    HashMap<Integer,Passenger> passengerDb;
-    HashMap<Integer,List<Integer>> fpDb;
-    HashMap<Integer,List<Integer>> pfDb;
+    HashMap<String,Airport> airportDb = new HashMap<>();
+    HashMap<Integer,Flight> flightDb = new HashMap<>();
+    HashMap<Integer,Passenger> passengerDb = new HashMap<>();
+    HashMap<Integer,List<Integer>> fpDb = new HashMap<>();
+    HashMap<Integer,List<Integer>> pfDb = new HashMap<>();
 
     AirportRepository(){
-        this.airportDb = new HashMap<>();
-        this.flightDb = new HashMap<>();
-        this.passengerDb = new HashMap<>();
-        this.fpDb = new HashMap<>();
-        this.pfDb = new HashMap<>();
+
     }
     public void addAirport(Airport airport){
         airportDb.put(airport.getAirportName(),airport);
     }
 
-    public List<String> getLargestAirportName(){
+    public String getLargestAirportName(){
+        if(airportDb.size()<=0) return null;
         List<String> largeAir = new ArrayList<>();
-        int large = 0;
+        int large = -1;
         for(String name : airportDb.keySet()){
             int term = airportDb.get(name).getNoOfTerminals();
             if(term>large){
@@ -42,7 +36,8 @@ public class AirportRepository {
             }
             if(term==large) largeAir.add(name);
         }
-        return largeAir;
+        Collections.sort(largeAir);
+        return largeAir.get(0);
     }
 
     public double getShortestDurationOfPossibleBetweenTwoCities(City fromCity, City toCity){
@@ -81,8 +76,7 @@ public class AirportRepository {
 
     public String bookATicket(Integer flightId,Integer passengerId){
         if(!flightDb.containsKey(flightId) || !passengerDb.containsKey(passengerId)) return "FAILURE";
-        Flight flight = flightDb.get(flightId);
-        if(fpDb.get(flightId).size()==flight.getMaxCapacity() || pfDb.containsKey(passengerId)) return "FAILURE";
+        if(fpDb.get(flightId).size()==flightDb.get(flightId).getMaxCapacity()) return "FAILURE";
         if(fpDb.get(flightId).contains(passengerId)) return "FAILURE";
         fpDb.get(flightId).add(passengerId);
         pfDb.get(passengerId).add(flightId);
@@ -90,12 +84,13 @@ public class AirportRepository {
     }
 
     public String cancelATicket(Integer flightId,Integer passengerId){
-        if(!flightDb.containsKey(flightId) || !passengerDb.containsKey(passengerId) || !fpDb.containsKey(flightId) || !pfDb.containsKey(passengerId)) return "FAILURE";
+        if( !fpDb.containsKey(flightId) || !pfDb.containsKey(passengerId)) return "FAILURE";
+        if(!fpDb.get(flightId).contains(passengerId)) return "FAILURE";
+
         int pass = pfDb.get(passengerId).indexOf(flightId);
         pfDb.get(passengerId).remove(pass);
         int fli = fpDb.get(flightId).indexOf(passengerId);
         fpDb.get(flightId).remove(fli);
-
         return "SUCCESS";
     }
 
